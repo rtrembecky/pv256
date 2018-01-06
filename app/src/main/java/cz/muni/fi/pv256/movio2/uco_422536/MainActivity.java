@@ -1,25 +1,33 @@
 package cz.muni.fi.pv256.movio2.uco_422536;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 public class MainActivity extends AppCompatActivity implements MainFragment.OnMovieSelectListener {
 
-    private SharedPreferences mShared;
+    /*private SharedPreferences mShared;
     private SharedPreferences.Editor mSharedEditor;
-    private static final String THEME = "primaryTheme";
+    private static final String THEME = "primaryTheme";*/
     private boolean mTwoPane;
+    private DrawerLayout mDrawerLayout;
+    private NavigationView mNavigationView;
+    private ActionBarDrawerToggle mActionBarDrawerToggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        changeTheme(isPrimaryThemeSet());
+        // theme switch
+        //changeTheme(isPrimaryThemeSet());
 
         setContentView(R.layout.activity_main);
 
@@ -34,6 +42,83 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
             mTwoPane = false;
             getSupportActionBar().setElevation(0f);
         }
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mActionBarDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.app_name, R.string.app_name) {
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                invalidateOptionsMenu();
+            }
+
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                invalidateOptionsMenu();
+            }
+        };
+        mDrawerLayout.setDrawerListener(mActionBarDrawerToggle);
+
+        mNavigationView = (NavigationView) findViewById(R.id.navigation);
+        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.nav_all:
+                        if(!menuItem.isChecked()) {
+                            getSupportActionBar().setTitle(menuItem.getTitle());
+                            mNavigationView.getMenu().getItem(1).setChecked(false);
+                            mNavigationView.getMenu().getItem(2).setChecked(false);
+                        }
+                        break;
+                    case R.id.nav_action:
+                        if(!menuItem.isChecked()) {
+                            getSupportActionBar().setTitle(menuItem.getTitle());
+                            mNavigationView.getMenu().getItem(0).setChecked(false);
+                            mNavigationView.getMenu().getItem(2).setChecked(false);
+                        }
+                        break;
+                    case R.id.nav_adventure:
+                        if(!menuItem.isChecked()) {
+                            getSupportActionBar().setTitle(menuItem.getTitle());
+                            mNavigationView.getMenu().getItem(0).setChecked(false);
+                            mNavigationView.getMenu().getItem(1).setChecked(false);
+                        }
+                        break;
+                }
+                mDrawerLayout.closeDrawers();
+                menuItem.setChecked(true);
+                return true;
+            }
+        });
+
+        mNavigationView.setCheckedItem(0);
+        getSupportActionBar().setTitle(mNavigationView.getMenu().getItem(0).getTitle());
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mActionBarDrawerToggle.syncState();
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                if (mDrawerLayout.isDrawerOpen(mNavigationView))
+                    mDrawerLayout.closeDrawers();
+                else
+                    mDrawerLayout.openDrawer(GravityCompat.START);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -52,8 +137,8 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
             startActivity(intent);
         }
     }
-
-    public void buttonClick(View v) {
+// theme switch
+/*    public void buttonClick(View v) {
         mSharedEditor = mShared.edit();
         boolean primaryTheme = isPrimaryThemeSet();
         mSharedEditor.putBoolean(THEME, !primaryTheme);
@@ -74,5 +159,5 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
     public boolean isPrimaryThemeSet() {
         mShared = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         return mShared.getBoolean(THEME, true);
-    }
+    }*/
 }

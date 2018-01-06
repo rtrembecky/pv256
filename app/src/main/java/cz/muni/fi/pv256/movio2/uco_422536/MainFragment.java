@@ -1,15 +1,20 @@
 package cz.muni.fi.pv256.movio2.uco_422536;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -27,9 +32,10 @@ public class MainFragment extends Fragment {
     private static final String SELECTED_KEY = "selected_position";
 
     private int mPosition = ListView.INVALID_POSITION;
-    private OnMovieSelectListener mListener;
+
     private Context mContext;
-    private ListView mListView;
+    private RecyclerView mRecyclerView;
+    private OnMovieSelectListener mListener;
 
     @Override
     public void onAttach(Context activity) {
@@ -62,24 +68,28 @@ public class MainFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
 
         ArrayList<Movie> movieList = new ArrayList<>();
-        movieList.add(new Movie(getCurrentTime().getTime(), "Cover path 1", "Shrek", "Backdrop 1", 0.7f, R.drawable.shrek));
-        movieList.add(new Movie(getCurrentTime().getTime(), "Cover path 2", "Čiara", "Backdrop 2", 0.6f, R.drawable.ciara));
-        movieList.add(new Movie(getCurrentTime().getTime(), "Cover path 3", "Špina", "Backdrop 3", 0.5f, R.drawable.spina));
-        movieList.add(new Movie(getCurrentTime().getTime(), "Cover path 4", "Once upon a time in Venice", "Backdrop 4", 0.3f, R.drawable.once_upon_a_time_in_venice));
-        movieList.add(new Movie(getCurrentTime().getTime(), "Cover path 5", "Spiderman", "Backdrop 5", 0.9f, R.drawable.spiderman));
-        movieList.add(new Movie(getCurrentTime().getTime(), "Cover path 6", "24 hours to live", "Backdrop 6", 0.8f, R.drawable.twentytwo_hours_to_live));
+        movieList.add(new Movie(getCurrentTime().getTime(), "olaf_cover", "Olaf's Frozen Adventure", "olaf", 5.9f));
+        movieList.add(new Movie(getCurrentTime().getTime(), "last_jedi_cover", "Star Wars: The Last Jedi", "last_jedi", 7.3f));
+        movieList.add(new Movie(getCurrentTime().getTime(), "coco_cover", "Coco", "coco", 7.5f));
+        movieList.add(new Movie(getCurrentTime().getTime(), "dunkirk_cover", "Dunkirk", "dunkirk", 7.4f));
+        movieList.add(new Movie(getCurrentTime().getTime(), "jumanji_cover", "Jumanji", "jumanji", 6.3f));
 
-        mListView = (ListView) view.findViewById(R.id.listview_movies);
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_movies);
 
         if (movieList != null && !movieList.isEmpty()) {
-            setAdapter(mListView, movieList);
+            setAdapter(mRecyclerView, movieList);
+        }
+        else {
+            view = inflater.inflate(R.layout.list_empty, container, false);
+            if (isOffline())
+                ((TextView) view.findViewById(R.id.list_empty_text)).setText("Not connected");
         }
 
         if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
             mPosition = savedInstanceState.getInt(SELECTED_KEY);
 
             if (mPosition != ListView.INVALID_POSITION) {
-                mListView.smoothScrollToPosition(mPosition);
+                mRecyclerView.smoothScrollToPosition(mPosition);
             }
         }
 
@@ -91,6 +101,13 @@ public class MainFragment extends Fragment {
         return cal.getTime();
     }
 
+    public boolean isOffline()
+    {
+        ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo network = cm.getActiveNetworkInfo();
+        return (network == null || !network.isConnected());
+    }
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         if (mPosition != ListView.INVALID_POSITION) {
@@ -99,28 +116,10 @@ public class MainFragment extends Fragment {
         super.onSaveInstanceState(outState);
     }
 
-    private void setAdapter(ListView movieLV, final ArrayList<Movie> movieList) {
-        MovieAdapter adapter = new MovieAdapter(movieList, mContext);
-        movieLV.setAdapter(adapter);
-
-        // set on click listener
-        movieLV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mPosition = position;
-                mListener.onMovieSelect(movieList.get(position));
-            }
-        });
-
-        // set on long click listener
-        movieLV.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(mContext, movieList.get(position).getTitle(), Toast.LENGTH_SHORT)
-                        .show();
-                return true;
-            }
-        });
+    private void setAdapter(RecyclerView movieRV, final ArrayList<Movie> movieList) {
+        MovieAdapter adapter = new MovieAdapter(movieList, getContext());
+        movieRV.setAdapter(adapter);
+        movieRV.setLayoutManager(new LinearLayoutManager(mContext));
     }
 
     public interface OnMovieSelectListener {
