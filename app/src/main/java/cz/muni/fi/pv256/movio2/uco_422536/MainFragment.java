@@ -12,10 +12,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -44,7 +42,8 @@ public class MainFragment extends Fragment {
         try {
             mListener = (OnMovieSelectListener) activity;
         } catch (ClassCastException e) {
-            Log.e(TAG, "Activity must implement OnMovieSelectListener", e);
+            if(BuildConfig.logging)
+                Log.e(TAG, "Activity must implement OnMovieSelectListener", e);
         }
     }
 
