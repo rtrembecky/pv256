@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PV256 Movio 2</string>
+    <string name="changeTheme">Zmeniť tému</string>
+    <string name="title_activity_detail">Detail filmu</string>
+    <string name="no_data">Žiadne dáta</string>
+    <string name="all">Všetko</string>
+    <string name="action">Akčné</string>
+    <string name="adventure">Dobrodružné</string>
+</resources>
