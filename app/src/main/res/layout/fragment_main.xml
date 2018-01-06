@@ -1,9 +1,15 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
              android:layout_width="match_parent"
              android:layout_height="match_parent">
-    <ListView
-        android:id="@+id/listview_movies"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerview_movies"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:divider="@null" />
+    <ViewStub
+        android:id="@+id/viewstub_empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout="@layout/list_empty"/>
 </FrameLayout>

@@ -11,6 +11,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by Richard on 14.12.2017.
  */
@@ -52,18 +55,18 @@ public class DetailFragment extends Fragment {
 
         if (mMovie != null) {
             titleTv.setText(mMovie.getTitle());
-            titleLowTv.setText(mMovie.getCoverPath());
+            titleLowTv.setText(new SimpleDateFormat("MM/dd/yyyy").format(new Date(mMovie.getReleaseDate())));
             setCoverImage(coverIv, mMovie);
         }
-
         return view;
     }
 
     private void setCoverImage(ImageView coverIv, Movie movie) {
+        int coverId = mContext.getResources().getIdentifier(movie.getCoverPath(), "drawable", mContext.getPackageName());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            coverIv.setImageDrawable(mContext.getDrawable(movie.getCoverId()));
+            coverIv.setImageDrawable(mContext.getDrawable(coverId));
         } else {
-            coverIv.setImageDrawable(mContext.getResources().getDrawable(movie.getCoverId()));
+            coverIv.setImageDrawable(mContext.getResources().getDrawable(coverId));
         }
     }
 }
