@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -24,7 +26,6 @@ public class DetailFragment extends Fragment {
 
     private Context mContext;
     private Movie mMovie;
-
 
     public static DetailFragment newInstance(Movie movie) {
         DetailFragment fragment = new DetailFragment();
@@ -51,22 +52,16 @@ public class DetailFragment extends Fragment {
 
         TextView titleTv = (TextView) view.findViewById(R.id.detail_movie);
         TextView titleLowTv = (TextView) view.findViewById(R.id.detail_movie_low);
-        ImageView coverIv = (ImageView) view.findViewById(R.id.detail_icon);
+        ImageView coverIv = (ImageView) view.findViewById(R.id.detail_cover);
+        ImageView backdropIv = (ImageView) view.findViewById(R.id.detail_backdrop);
 
         if (mMovie != null) {
             titleTv.setText(mMovie.getTitle());
-            titleLowTv.setText(new SimpleDateFormat("MM/dd/yyyy").format(new Date(mMovie.getReleaseDate())));
-            setCoverImage(coverIv, mMovie);
+            titleLowTv.setText(new SimpleDateFormat("dd. MM. yyyy").format(new Date(mMovie.getReleaseDate())));
+            Picasso picasso = new Picasso.Builder(mContext).build();
+            picasso.load("https://image.tmdb.org/t/p/w300/" + mMovie.getCoverPath()).into(coverIv);
+            picasso.load("https://image.tmdb.org/t/p/w500/" + mMovie.getBackdrop()).into(backdropIv);
         }
         return view;
-    }
-
-    private void setCoverImage(ImageView coverIv, Movie movie) {
-        int coverId = mContext.getResources().getIdentifier(movie.getCoverPath(), "drawable", mContext.getPackageName());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            coverIv.setImageDrawable(mContext.getDrawable(coverId));
-        } else {
-            coverIv.setImageDrawable(mContext.getResources().getDrawable(coverId));
-        }
     }
 }

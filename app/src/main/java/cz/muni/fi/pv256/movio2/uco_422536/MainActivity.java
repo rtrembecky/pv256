@@ -1,6 +1,7 @@
 package cz.muni.fi.pv256.movio2.uco_422536;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
@@ -21,6 +22,12 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
     private DrawerLayout mDrawerLayout;
     private NavigationView mNavigationView;
     private ActionBarDrawerToggle mActionBarDrawerToggle;
+    private MainFragment mMainFragment;
+    private int mMenuSelectedCategory;
+
+    public int getMenuSelectedCategory() {
+        return mMenuSelectedCategory;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,13 +70,15 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
         mNavigationView = (NavigationView) findViewById(R.id.navigation);
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public boolean onNavigationItemSelected(MenuItem menuItem) {
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.nav_all:
                         if(!menuItem.isChecked()) {
                             getSupportActionBar().setTitle(menuItem.getTitle());
                             mNavigationView.getMenu().getItem(1).setChecked(false);
                             mNavigationView.getMenu().getItem(2).setChecked(false);
+                            mMenuSelectedCategory = 0;
+                            mMainFragment.downloadData();
                         }
                         break;
                     case R.id.nav_action:
@@ -77,6 +86,8 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
                             getSupportActionBar().setTitle(menuItem.getTitle());
                             mNavigationView.getMenu().getItem(0).setChecked(false);
                             mNavigationView.getMenu().getItem(2).setChecked(false);
+                            mMenuSelectedCategory = 1;
+                            mMainFragment.downloadData();
                         }
                         break;
                     case R.id.nav_adventure:
@@ -84,6 +95,8 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
                             getSupportActionBar().setTitle(menuItem.getTitle());
                             mNavigationView.getMenu().getItem(0).setChecked(false);
                             mNavigationView.getMenu().getItem(1).setChecked(false);
+                            mMenuSelectedCategory = 2;
+                            mMainFragment.downloadData();
                         }
                         break;
                 }
@@ -93,8 +106,12 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
             }
         });
 
-        mNavigationView.setCheckedItem(0);
-        getSupportActionBar().setTitle(mNavigationView.getMenu().getItem(0).getTitle());
+        mMenuSelectedCategory = 0;
+        MenuItem menuAll = mNavigationView.getMenu().getItem(0);
+        menuAll.setChecked(true);
+        getSupportActionBar().setTitle(menuAll.getTitle());
+
+        mMainFragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_main);
     }
 
     @Override
