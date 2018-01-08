@@ -2,8 +2,10 @@
     <string name="app_name">PV256 Movio 2</string>
     <string name="changeTheme">Change Theme</string>
     <string name="title_activity_detail">Movie Detail</string>
-    <string name="no_data">No data</string>
-    <string name="all">All</string>
+    <string name="no_data">No data - No internet connection</string>
+    <string name="all">Upcoming</string>
+    <string name="menu_new">New</string>
+    <string name="popular">Popular</string>
     <string name="action">Action</string>
     <string name="adventure">Adventure</string>
 </resources>

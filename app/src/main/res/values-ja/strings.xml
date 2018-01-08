@@ -5,6 +5,8 @@
     <string name="title_activity_detail">映画の詳細</string>
     <string name="no_data">bong</string>
     <string name="all">bim</string>
+    <string name="menu_new">bam</string>
+    <string name="popular">zhon</string>
     <string name="action">hin</string>
     <string name="adventure">jing jang</string>
 </resources>
