@@ -15,6 +15,10 @@ import android.view.View;
 
 public class MainActivity extends AppCompatActivity implements MainFragment.OnMovieSelectListener {
 
+    public static final String MOVIE = "movie";
+    public static final String CATEGORY = "CATEGORY";
+    public static final String POSITION = "position";
+
     /*private SharedPreferences mShared;
     private SharedPreferences.Editor mSharedEditor;
     private static final String THEME = "primaryTheme";*/
@@ -23,10 +27,10 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
     private NavigationView mNavigationView;
     private ActionBarDrawerToggle mActionBarDrawerToggle;
     private MainFragment mMainFragment;
-    private static int mMenuSelectedCategory;
+    private static int mSelectedCategory = 0;
 
-    public static int getMenuSelectedCategory() {
-        return mMenuSelectedCategory;
+    public static int getSelectedCategory() {
+        return mSelectedCategory;
     }
 
     @Override
@@ -53,6 +57,8 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
+        mMainFragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_main);
+
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mActionBarDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.app_name, R.string.app_name) {
             public void onDrawerClosed(View view) {
@@ -71,47 +77,47 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.nav_all:
-                        if(!menuItem.isChecked()) {
-                            getSupportActionBar().setTitle(menuItem.getTitle());
-                            mNavigationView.getMenu().getItem(1).setChecked(false);
-                            mNavigationView.getMenu().getItem(2).setChecked(false);
-                            mMenuSelectedCategory = 0;
-                            mMainFragment.downloadData();
-                        }
-                        break;
-                    case R.id.nav_action:
-                        if(!menuItem.isChecked()) {
-                            getSupportActionBar().setTitle(menuItem.getTitle());
-                            mNavigationView.getMenu().getItem(0).setChecked(false);
-                            mNavigationView.getMenu().getItem(2).setChecked(false);
-                            mMenuSelectedCategory = 1;
-                            mMainFragment.downloadData();
-                        }
-                        break;
-                    case R.id.nav_adventure:
-                        if(!menuItem.isChecked()) {
-                            getSupportActionBar().setTitle(menuItem.getTitle());
-                            mNavigationView.getMenu().getItem(0).setChecked(false);
-                            mNavigationView.getMenu().getItem(1).setChecked(false);
-                            mMenuSelectedCategory = 2;
-                            mMainFragment.downloadData();
-                        }
-                        break;
-                }
-                mDrawerLayout.closeDrawers();
-                menuItem.setChecked(true);
+                onMenuItemSelected(menuItem);
                 return true;
             }
         });
 
-        mMenuSelectedCategory = 0;
-        MenuItem menuAll = mNavigationView.getMenu().getItem(0);
-        menuAll.setChecked(true);
-        getSupportActionBar().setTitle(menuAll.getTitle());
+        MenuItem menuItem = mNavigationView.getMenu().getItem(mSelectedCategory);
+        onMenuItemSelected(menuItem);
+    }
 
-        mMainFragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_main);
+    private void onMenuItemSelected(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.nav_all:
+                if(!menuItem.isChecked()) {
+                    getSupportActionBar().setTitle(menuItem.getTitle());
+                    mNavigationView.getMenu().getItem(1).setChecked(false);
+                    mNavigationView.getMenu().getItem(2).setChecked(false);
+                    mSelectedCategory = 0;
+                    mMainFragment.downloadData();
+                }
+                break;
+            case R.id.nav_action:
+                if(!menuItem.isChecked()) {
+                    getSupportActionBar().setTitle(menuItem.getTitle());
+                    mNavigationView.getMenu().getItem(0).setChecked(false);
+                    mNavigationView.getMenu().getItem(2).setChecked(false);
+                    mSelectedCategory = 1;
+                    mMainFragment.downloadData();
+                }
+                break;
+            case R.id.nav_adventure:
+                if(!menuItem.isChecked()) {
+                    getSupportActionBar().setTitle(menuItem.getTitle());
+                    mNavigationView.getMenu().getItem(0).setChecked(false);
+                    mNavigationView.getMenu().getItem(1).setChecked(false);
+                    mSelectedCategory = 2;
+                    mMainFragment.downloadData();
+                }
+                break;
+        }
+        mDrawerLayout.closeDrawers();
+        menuItem.setChecked(true);
     }
 
     @Override
@@ -139,7 +145,24 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
     }
 
     @Override
-    public void onMovieSelect(Movie movie) {
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        int position = getIntent().getIntExtra(POSITION, 0);
+        Movie movie = getIntent().getParcelableExtra(MOVIE);
+        mSelectedCategory = getIntent().getIntExtra(CATEGORY, 0);
+        MenuItem menuItem = mNavigationView.getMenu().getItem(mSelectedCategory);
+        onMenuItemSelected(menuItem);
+        if (movie != null) {
+            onMovieSelect(movie, position);
+        }
+
+        ((MainFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_main)).setPosition(position);
+        ((MainFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_main)).downloadData();
+    }
+
+    @Override
+    public void onMovieSelect(Movie movie, int position) {
         if (mTwoPane) {
             FragmentManager fm = getSupportFragmentManager();
 
@@ -150,7 +173,9 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
 
         } else {
             Intent intent = new Intent(this, MovieDetailActivity.class);
-            intent.putExtra(MovieDetailActivity.DETAILED_MOVIE, movie);
+            intent.putExtra(MOVIE, movie);
+            intent.putExtra(CATEGORY, mSelectedCategory);
+            intent.putExtra(POSITION, position);
             startActivity(intent);
         }
     }

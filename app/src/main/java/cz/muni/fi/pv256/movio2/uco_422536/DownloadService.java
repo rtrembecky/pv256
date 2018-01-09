@@ -80,7 +80,7 @@ public class DownloadService extends IntentService {
             String weekLater = formatter.format(cal.getTime());
 
             String genres = "";
-            int category = MainActivity.getMenuSelectedCategory();
+            int category = MainActivity.getSelectedCategory();
             switch (category) {
                 case 0:
                     break;

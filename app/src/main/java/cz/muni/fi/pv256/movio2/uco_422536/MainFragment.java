@@ -17,7 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
-import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +26,7 @@ import static cz.muni.fi.pv256.movio2.uco_422536.DownloadService.DOWNLOAD;
 import static cz.muni.fi.pv256.movio2.uco_422536.DownloadService.OK;
 import static cz.muni.fi.pv256.movio2.uco_422536.DownloadService.STATUS;
 import static cz.muni.fi.pv256.movio2.uco_422536.DownloadService.UPCOMING;
+import static cz.muni.fi.pv256.movio2.uco_422536.MainActivity.POSITION;
 
 /**
  * Created by Richard on 14.12.2017.
@@ -34,16 +35,19 @@ import static cz.muni.fi.pv256.movio2.uco_422536.DownloadService.UPCOMING;
 public class MainFragment extends Fragment {
 
     public static final String TAG = MainFragment.class.getSimpleName();
-    private static final String SELECTED_KEY = "selected_position";
 
-    private int mPosition = ListView.INVALID_POSITION;
-
+    private int mPosition = 0;
     private Context mContext;
     private RecyclerView mRecyclerView;
     private ViewStub mViewStub;
     private MovieAdapter mMovieAdapter;
     private OnMovieSelectListener mListener;
     private MovieDownloadBroadcastReceiver mReceiver;
+    private TextView mNoDataTv;
+
+    public void setPosition(int position) {
+        mPosition = position;
+    }
 
     @Override
     public void onAttach(Context activity) {
@@ -77,6 +81,7 @@ public class MainFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_movies);
         mViewStub = (ViewStub) view.findViewById(R.id.viewstub_empty);
+        mNoDataTv = (TextView) view.findViewById(R.id.list_empty_text);
 
         MovieData.initialize();
         setAdapter(mRecyclerView, (ArrayList<Movie>) MovieData.getMoviesByCategory(0));
@@ -88,11 +93,9 @@ public class MainFragment extends Fragment {
             downloadData();
         }
 
-        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
-            mPosition = savedInstanceState.getInt(SELECTED_KEY);
-            if (mPosition != ListView.INVALID_POSITION) {
-                mRecyclerView.smoothScrollToPosition(mPosition);
-            }
+        if (savedInstanceState != null && savedInstanceState.containsKey(POSITION)) {
+            mPosition = savedInstanceState.getInt(POSITION);
+            mRecyclerView.smoothScrollToPosition(mPosition);
         }
 
         return view;
@@ -115,9 +118,7 @@ public class MainFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        if (mPosition != ListView.INVALID_POSITION) {
-            outState.putInt(SELECTED_KEY, mPosition);
-        }
+        outState.putInt(POSITION, mPosition);
         super.onSaveInstanceState(outState);
     }
 
@@ -128,7 +129,7 @@ public class MainFragment extends Fragment {
     }
 
     public interface OnMovieSelectListener {
-        void onMovieSelect(Movie movie);
+        void onMovieSelect(Movie movie, int position);
     }
 
     private class MovieDownloadBroadcastReceiver extends BroadcastReceiver {
@@ -137,25 +138,30 @@ public class MainFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             String status = intent.getStringExtra(STATUS);
             List<Movie> movieList = new ArrayList<>();
+            boolean successful = false;
             if (status.equals(OK)) {
-                movieList.addAll(getMovies((List<MovieDTO>) intent.getSerializableExtra(UPCOMING)));
+                movieList.addAll(getFilteredMovies((List<MovieDTO>) intent.getSerializableExtra(UPCOMING)));
+                successful = true;
             }
-            updateData(movieList, MainActivity.getMenuSelectedCategory());
+            updateData(movieList, MainActivity.getSelectedCategory(), successful);
         }
 
-        private List<Movie> getMovies(List<MovieDTO> movieList) {
+        private List<Movie> getFilteredMovies(List<MovieDTO> movieList) {
             List<Movie> movies = new ArrayList<>();
             for (MovieDTO m : movieList) {
-                Movie movie = new Movie(m.getReleaseDateAsLong(), m.getCoverPath(), m.getTitle(), m.getBackdrop(), m.getPopularityAsFloat());
-                movies.add(movie);
+                Movie movie = new Movie(m.getReleaseDateAsLong(), m.getCoverPath(), m.getTitle(), m.getBackdrop(), m.getPopularityAsFloat(), m.getDescription());
+                if (movie.getBackdrop() != null && movie.getCoverPath() != null) {
+                    movies.add(movie);
+                }
             }
             return movies;
         }
     }
 
-    private void updateData(List<Movie> movieList, int category) {
-        if (getActivity() == null)
+    private void updateData(List<Movie> movieList, int category, boolean successful) {
+        if (getActivity() == null) {
             return;
+        }
         MovieData.setMoviesByCategory(category, movieList);
         getActivity().runOnUiThread(new Runnable() {
             @Override
@@ -167,9 +173,16 @@ public class MainFragment extends Fragment {
         if (movieList.isEmpty()) {
             mRecyclerView.setVisibility(View.GONE);
             mViewStub.setVisibility(View.VISIBLE);
+            if (successful) {
+                mNoDataTv.setText(getString(R.string.no_data));
+            }
+            else {
+                mNoDataTv.setText(getString(R.string.no_connection));
+            }
         } else {
             mRecyclerView.setVisibility(View.VISIBLE);
             mViewStub.setVisibility(View.GONE);
+            mRecyclerView.smoothScrollToPosition(mPosition);
         }
     }
 }

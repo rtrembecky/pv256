@@ -21,13 +21,16 @@ public class MovieDTO {
     private String mBackdrop;
     @SerializedName("vote_average")
     private String mPopularity;
+    @SerializedName("overview")
+    private String mDescription;
 
-    public MovieDTO(String releaseDate, String coverPath, String title, String backdrop, String popularity) {
+    public MovieDTO(String releaseDate, String coverPath, String title, String backdrop, String popularity, String description) {
         mReleaseDate = releaseDate;
         mCoverPath = coverPath;
         mTitle = title;
         mBackdrop = backdrop;
         mPopularity = popularity;
+        mDescription = description;
     }
 
     public String getReleaseDate() {
@@ -63,5 +66,9 @@ public class MovieDTO {
 
     public Float getPopularityAsFloat() {
         return Float.parseFloat(getPopularity());
+    }
+
+    public String getDescription() {
+        return mDescription;
     }
 }
