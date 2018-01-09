@@ -23,9 +23,9 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
     private NavigationView mNavigationView;
     private ActionBarDrawerToggle mActionBarDrawerToggle;
     private MainFragment mMainFragment;
-    private int mMenuSelectedCategory;
+    private static int mMenuSelectedCategory;
 
-    public int getMenuSelectedCategory() {
+    public static int getMenuSelectedCategory() {
         return mMenuSelectedCategory;
     }
 

@@ -9,4 +9,7 @@
     <string name="popular">zhon</string>
     <string name="action">hin</string>
     <string name="adventure">jing jang</string>
+    <string name="downloadStarted">Downloading data&#8230;</string>
+    <string name="downloadFailed">Downloading failed!</string>
+    <string name="downloadDone">Downloading done!</string>
 </resources>

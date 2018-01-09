@@ -4,9 +4,13 @@
     <string name="changeTheme">Zmeniť tému</string>
     <string name="title_activity_detail">Detail filmu</string>
     <string name="no_data">Žiadne dáta - žiadne internetové pripojenie</string>
+    <string name="no_connection">Žiadne internetové pripojenie</string>
     <string name="all">Nadchádzajúce</string>
     <string name="menu_new">Nové</string>
     <string name="popular">Populárne</string>
     <string name="action">Akčné</string>
     <string name="adventure">Dobrodružné</string>
+    <string name="downloadStarted">Sťahujem dáta&#8230;</string>
+    <string name="downloadFailed">Sťahovanie dát zlyhalo!</string>
+    <string name="downloadDone">Sťahovanie dát ukonČené.</string>
 </resources>
