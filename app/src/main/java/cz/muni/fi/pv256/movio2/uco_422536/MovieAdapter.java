@@ -54,8 +54,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         holder.titleTv.setText(movie.getTitle());
         holder.popularityTv.setText(Float.toString(movie.getPopularity()));
 
-        Picasso picasso = new Picasso.Builder(mAppContext).build();
-        picasso.load("https://image.tmdb.org/t/p/w500/" + movie.getBackdrop()).into(holder.backdropIv, new com.squareup.picasso.Callback() {
+        Picasso.get().load("https://image.tmdb.org/t/p/w500/" + movie.getBackdrop()).into(holder.backdropIv, new com.squareup.picasso.Callback() {
             @Override
             public void onSuccess() {
                 Bitmap myBitmap = ((BitmapDrawable)holder.backdropIv.getDrawable()).getBitmap();

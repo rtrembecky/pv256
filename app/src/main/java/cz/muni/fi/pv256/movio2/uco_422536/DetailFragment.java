@@ -58,9 +58,8 @@ public class DetailFragment extends Fragment {
         if (mMovie != null) {
             titleTv.setText(mMovie.getTitle());
             titleLowTv.setText(new SimpleDateFormat("dd. MM. yyyy").format(new Date(mMovie.getReleaseDate())));
-            Picasso picasso = new Picasso.Builder(mContext).build();
-            picasso.load("https://image.tmdb.org/t/p/w300/" + mMovie.getCoverPath()).into(coverIv);
-            picasso.load("https://image.tmdb.org/t/p/w500/" + mMovie.getBackdrop()).into(backdropIv);
+            Picasso.get().load("https://image.tmdb.org/t/p/w300/" + mMovie.getCoverPath()).into(coverIv);
+            Picasso.get().load("https://image.tmdb.org/t/p/w500/" + mMovie.getBackdrop()).into(backdropIv);
         }
         return view;
     }
