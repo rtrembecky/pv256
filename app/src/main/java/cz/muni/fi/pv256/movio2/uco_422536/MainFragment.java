@@ -102,11 +102,16 @@ public class MainFragment extends Fragment {
     }
 
     public void downloadData() {
-        Intent intent = new Intent(getActivity(), DownloadService.class);
-        getActivity().startService(intent);
-        IntentFilter intentFilter = new IntentFilter(DOWNLOAD);
-        mReceiver = new MovieDownloadBroadcastReceiver();
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mReceiver, intentFilter);
+        List<Movie> movieList = MovieData.getMoviesByCategory(MainActivity.getSelectedCategory());
+        if (movieList.isEmpty()) {
+            Intent intent = new Intent(getActivity(), DownloadService.class);
+            getActivity().startService(intent);
+            IntentFilter intentFilter = new IntentFilter(DOWNLOAD);
+            mReceiver = new MovieDownloadBroadcastReceiver();
+            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mReceiver, intentFilter);
+        } else {
+            updateView(movieList, true);
+        }
     }
 
     public boolean isOffline()
@@ -143,7 +148,8 @@ public class MainFragment extends Fragment {
                 movieList.addAll(getFilteredMovies((List<MovieDTO>) intent.getSerializableExtra(UPCOMING)));
                 successful = true;
             }
-            updateData(movieList, MainActivity.getSelectedCategory(), successful);
+            MovieData.setMoviesByCategory(MainActivity.getSelectedCategory(), movieList);
+            updateView(movieList, successful);
         }
 
         private List<Movie> getFilteredMovies(List<MovieDTO> movieList) {
@@ -158,11 +164,10 @@ public class MainFragment extends Fragment {
         }
     }
 
-    private void updateData(List<Movie> movieList, int category, boolean successful) {
+    private void updateView(List<Movie> movieList, boolean successful) {
         if (getActivity() == null) {
             return;
         }
-        MovieData.setMoviesByCategory(category, movieList);
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
