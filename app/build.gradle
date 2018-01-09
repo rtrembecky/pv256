@@ -60,6 +60,9 @@ android {
             applicationId "cz.muni.fi.pv256.movio2.alt"
         }
     }
+    repositories {
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+    }
 }
 
 dependencies {
@@ -73,4 +76,8 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:25.4.0'
     compile 'com.android.support:design:25.4.0'
     compile 'com.android.support:palette-v7:25.4.0'
+    compile 'com.google.code.gson:gson:2.8.2'
+    compile 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
+    compile 'com.squareup.retrofit2:retrofit:2.3.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
 }

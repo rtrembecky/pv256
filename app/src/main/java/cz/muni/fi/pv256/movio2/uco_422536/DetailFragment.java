@@ -1,7 +1,6 @@
 package cz.muni.fi.pv256.movio2.uco_422536;
 
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -24,7 +25,6 @@ public class DetailFragment extends Fragment {
 
     private Context mContext;
     private Movie mMovie;
-
 
     public static DetailFragment newInstance(Movie movie) {
         DetailFragment fragment = new DetailFragment();
@@ -49,24 +49,23 @@ public class DetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
-        TextView titleTv = (TextView) view.findViewById(R.id.detail_movie);
-        TextView titleLowTv = (TextView) view.findViewById(R.id.detail_movie_low);
-        ImageView coverIv = (ImageView) view.findViewById(R.id.detail_icon);
+        TextView titleTv = (TextView) view.findViewById(R.id.detail_title);
+        TextView dateTv = (TextView) view.findViewById(R.id.detail_date);
+        TextView descriptionTv = (TextView) view.findViewById(R.id.detail_desc);
+        ImageView coverIv = (ImageView) view.findViewById(R.id.detail_cover);
+        ImageView backdropIv = (ImageView) view.findViewById(R.id.detail_backdrop);
 
         if (mMovie != null) {
+            view.setVisibility(View.VISIBLE);
             titleTv.setText(mMovie.getTitle());
-            titleLowTv.setText(new SimpleDateFormat("MM/dd/yyyy").format(new Date(mMovie.getReleaseDate())));
-            setCoverImage(coverIv, mMovie);
+            dateTv.setText(new SimpleDateFormat("dd. MM. yyyy").format(new Date(mMovie.getReleaseDate())));
+            descriptionTv.setText(mMovie.getDescription());
+            Picasso.get().load("https://image.tmdb.org/t/p/w300/" + mMovie.getCoverPath()).into(coverIv);
+            Picasso.get().load("https://image.tmdb.org/t/p/w500/" + mMovie.getBackdrop()).into(backdropIv);
+        }
+        else {
+            view.setVisibility(View.GONE);
         }
         return view;
-    }
-
-    private void setCoverImage(ImageView coverIv, Movie movie) {
-        int coverId = mContext.getResources().getIdentifier(movie.getCoverPath(), "drawable", mContext.getPackageName());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            coverIv.setImageDrawable(mContext.getDrawable(coverId));
-        } else {
-            coverIv.setImageDrawable(mContext.getResources().getDrawable(coverId));
-        }
     }
 }

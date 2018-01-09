@@ -61,3 +61,4 @@ fabric.properties
 # Keystore
 gradle.properties
 *keystore.jks
+*ApiKey.java

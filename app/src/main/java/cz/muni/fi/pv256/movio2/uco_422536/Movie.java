@@ -13,6 +13,7 @@ public class Movie implements Parcelable {
     private String mTitle;
     private String mBackdrop;
     private float mPopularity;
+    private String mDescription;
 
     public long getReleaseDate() {
         return mReleaseDate;
@@ -54,12 +55,21 @@ public class Movie implements Parcelable {
         mPopularity = popularity;
     }
 
-    public Movie(long releaseDate, String coverPath, String title, String backdrop, float popularity) {
+    public String getDescription() {
+        return mDescription;
+    }
+
+    public void setDescription(String description) {
+        mDescription = description;
+    }
+
+    public Movie(long releaseDate, String coverPath, String title, String backdrop, float popularity, String description) {
         mReleaseDate = releaseDate;
         mCoverPath = coverPath;
         mTitle = title;
         mBackdrop = backdrop;
         mPopularity = popularity;
+        mDescription = description;
     }
 
     @Override
@@ -74,6 +84,7 @@ public class Movie implements Parcelable {
         dest.writeString(mTitle);
         dest.writeString(mBackdrop);
         dest.writeFloat(mPopularity);
+        dest.writeString(mDescription);
     }
 
     public Movie(Parcel in) {
@@ -82,6 +93,7 @@ public class Movie implements Parcelable {
         mTitle = in.readString();
         mBackdrop = in.readString();
         mPopularity = in.readFloat();
+        mDescription = in.readString();
     }
 
     public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
