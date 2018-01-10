@@ -8,12 +8,21 @@ import android.os.Parcelable;
  */
 
 public class Movie implements Parcelable {
+    private Long mId;
     private long mReleaseDate;
     private String mCoverPath;
     private String mTitle;
     private String mBackdrop;
     private float mPopularity;
     private String mDescription;
+
+    public Long getId() {
+        return mId;
+    }
+
+    public void setId(Long id) {
+        mId = id;
+    }
 
     public long getReleaseDate() {
         return mReleaseDate;
@@ -63,7 +72,7 @@ public class Movie implements Parcelable {
         mDescription = description;
     }
 
-    public Movie(long releaseDate, String coverPath, String title, String backdrop, float popularity, String description) {
+    public Movie(long id, long releaseDate, String coverPath, String title, String backdrop, float popularity, String description) {
         mReleaseDate = releaseDate;
         mCoverPath = coverPath;
         mTitle = title;

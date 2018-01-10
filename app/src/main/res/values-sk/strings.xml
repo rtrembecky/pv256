@@ -12,5 +12,6 @@
     <string name="adventure">Dobrodružné</string>
     <string name="downloadStarted">Sťahujem dáta&#8230;</string>
     <string name="downloadFailed">Sťahovanie dát zlyhalo!</string>
-    <string name="downloadDone">Sťahovanie dát ukonČené.</string>
+    <string name="downloadDone">Sťahovanie dát ukončené.</string>
+    <string name="favorites">Obľúbené</string>
 </resources>

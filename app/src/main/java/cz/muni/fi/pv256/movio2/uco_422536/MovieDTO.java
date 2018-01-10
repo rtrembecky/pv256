@@ -11,6 +11,8 @@ import java.util.Date;
  */
 
 public class MovieDTO {
+    @SerializedName("id")
+    private String mId;
     @SerializedName("release_date")
     private String mReleaseDate;
     @SerializedName("poster_path")
@@ -24,13 +26,22 @@ public class MovieDTO {
     @SerializedName("overview")
     private String mDescription;
 
-    public MovieDTO(String releaseDate, String coverPath, String title, String backdrop, String popularity, String description) {
+    public MovieDTO(String id, String releaseDate, String coverPath, String title, String backdrop, String popularity, String description) {
+        mId = id;
         mReleaseDate = releaseDate;
         mCoverPath = coverPath;
         mTitle = title;
         mBackdrop = backdrop;
         mPopularity = popularity;
         mDescription = description;
+    }
+
+    public String getId() {
+        return mId;
+    }
+
+    public Long getIdAsLong() {
+        return Long.parseLong(mId);
     }
 
     public String getReleaseDate() {

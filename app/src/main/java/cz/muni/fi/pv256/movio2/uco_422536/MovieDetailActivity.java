@@ -4,8 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import static cz.muni.fi.pv256.movio2.uco_422536.MainActivity.CATEGORY;
+import static cz.muni.fi.pv256.movio2.uco_422536.MainActivity.FAVORITES;
 import static cz.muni.fi.pv256.movio2.uco_422536.MainActivity.MOVIE;
 import static cz.muni.fi.pv256.movio2.uco_422536.MainActivity.POSITION;
 
@@ -27,6 +29,7 @@ public class MovieDetailActivity extends AppCompatActivity {
             intent.putExtra(MOVIE, movie);
             intent.putExtra(CATEGORY, getIntent().getIntExtra(CATEGORY, 0));
             intent.putExtra(POSITION, getIntent().getIntExtra(POSITION, 0));
+            intent.putExtra(FAVORITES, getIntent().getBooleanExtra(FAVORITES, false));
             startActivity(intent);
             return;
         }

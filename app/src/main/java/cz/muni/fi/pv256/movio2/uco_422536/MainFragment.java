@@ -36,17 +36,27 @@ public class MainFragment extends Fragment {
 
     public static final String TAG = MainFragment.class.getSimpleName();
 
-    private int mPosition = 0;
-    private Context mContext;
     private RecyclerView mRecyclerView;
     private ViewStub mViewStub;
+    private TextView mNoDataTv;
+
+    private Context mContext;
     private MovieAdapter mMovieAdapter;
     private OnMovieSelectListener mListener;
     private MovieDownloadBroadcastReceiver mReceiver;
-    private TextView mNoDataTv;
+    private int mPosition = 0;
+    private boolean mFavorites;
 
     public void setPosition(int position) {
         mPosition = position;
+    }
+
+    public boolean isFavorites() {
+        return mFavorites;
+    }
+
+    public void setFavorites(boolean favorites) {
+        mFavorites = favorites;
     }
 
     @Override
@@ -90,7 +100,7 @@ public class MainFragment extends Fragment {
             view = inflater.inflate(R.layout.list_empty, container, false);
         }
         else {
-            downloadData();
+            updateData();
         }
 
         if (savedInstanceState != null && savedInstanceState.containsKey(POSITION)) {
@@ -101,17 +111,21 @@ public class MainFragment extends Fragment {
         return view;
     }
 
-    public void downloadData() {
+    public void updateData() {
         List<Movie> movieList = MovieData.getMoviesByCategory(MainActivity.getSelectedCategory());
         if (movieList.isEmpty()) {
-            Intent intent = new Intent(getActivity(), DownloadService.class);
-            getActivity().startService(intent);
-            IntentFilter intentFilter = new IntentFilter(DOWNLOAD);
-            mReceiver = new MovieDownloadBroadcastReceiver();
-            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mReceiver, intentFilter);
+            downloadData();
         } else {
             updateView(movieList, true);
         }
+    }
+
+    private void downloadData() {
+        Intent intent = new Intent(getActivity(), DownloadService.class);
+        getActivity().startService(intent);
+        IntentFilter intentFilter = new IntentFilter(DOWNLOAD);
+        mReceiver = new MovieDownloadBroadcastReceiver();
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mReceiver, intentFilter);
     }
 
     public boolean isOffline()
@@ -155,13 +169,17 @@ public class MainFragment extends Fragment {
         private List<Movie> getFilteredMovies(List<MovieDTO> movieList) {
             List<Movie> movies = new ArrayList<>();
             for (MovieDTO m : movieList) {
-                Movie movie = new Movie(m.getReleaseDateAsLong(), m.getCoverPath(), m.getTitle(), m.getBackdrop(), m.getPopularityAsFloat(), m.getDescription());
+                Movie movie = new Movie(m.getIdAsLong(), m.getReleaseDateAsLong(), m.getCoverPath(), m.getTitle(), m.getBackdrop(), m.getPopularityAsFloat(), m.getDescription());
                 if (movie.getBackdrop() != null && movie.getCoverPath() != null) {
                     movies.add(movie);
                 }
             }
             return movies;
         }
+    }
+
+    public void updateView(List<Movie> movieList) {
+        updateView(movieList, true);
     }
 
     private void updateView(List<Movie> movieList, boolean successful) {

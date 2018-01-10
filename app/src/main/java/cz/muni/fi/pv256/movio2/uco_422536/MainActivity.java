@@ -9,15 +9,19 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.SwitchCompat;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
 
 public class MainActivity extends AppCompatActivity implements MainFragment.OnMovieSelectListener {
 
     public static final String MOVIE = "movie";
-    public static final String CATEGORY = "CATEGORY";
+    public static final String CATEGORY = "category";
     public static final String POSITION = "position";
+    public static final String FAVORITES = "favorites";
 
     /*private SharedPreferences mShared;
     private SharedPreferences.Editor mSharedEditor;
@@ -26,6 +30,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
     private DrawerLayout mDrawerLayout;
     private NavigationView mNavigationView;
     private ActionBarDrawerToggle mActionBarDrawerToggle;
+    private SwitchCompat mSwitch;
     private MainFragment mMainFragment;
     private static int mSelectedCategory = 0;
 
@@ -63,12 +68,10 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
         mActionBarDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.app_name, R.string.app_name) {
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
-                invalidateOptionsMenu();
             }
 
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                invalidateOptionsMenu();
             }
         };
         mDrawerLayout.setDrawerListener(mActionBarDrawerToggle);
@@ -94,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
                     mNavigationView.getMenu().getItem(1).setChecked(false);
                     mNavigationView.getMenu().getItem(2).setChecked(false);
                     mSelectedCategory = 0;
-                    mMainFragment.downloadData();
+                    mMainFragment.updateData();
                 }
                 break;
             case R.id.nav_action:
@@ -103,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
                     mNavigationView.getMenu().getItem(0).setChecked(false);
                     mNavigationView.getMenu().getItem(2).setChecked(false);
                     mSelectedCategory = 1;
-                    mMainFragment.downloadData();
+                    mMainFragment.updateData();
                 }
                 break;
             case R.id.nav_adventure:
@@ -112,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
                     mNavigationView.getMenu().getItem(0).setChecked(false);
                     mNavigationView.getMenu().getItem(1).setChecked(false);
                     mSelectedCategory = 2;
-                    mMainFragment.downloadData();
+                    mMainFragment.updateData();
                 }
                 break;
         }
@@ -145,20 +148,44 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        MenuItem item = menu.findItem(R.id.menu);
+        item.setActionView(R.layout.action_bar);
+        mSwitch = (SwitchCompat) item.getActionView().findViewById(R.id.favorites_switch);
+        mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                mDrawerLayout.closeDrawers();
+                mMainFragment.setPosition(0);
+                mMainFragment.setFavorites(b);
+                mMainFragment.updateData();
+            }
+        });
+        return true;
+    }
+
+    @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
-        int position = getIntent().getIntExtra(POSITION, 0);
-        Movie movie = getIntent().getParcelableExtra(MOVIE);
-        mSelectedCategory = getIntent().getIntExtra(CATEGORY, 0);
+
+        int position = 0;
+        Movie movie = null;
+        if (mTwoPane) {
+            position = getIntent().getIntExtra(POSITION, 0);
+            movie = getIntent().getParcelableExtra(MOVIE);
+            mSelectedCategory = getIntent().getIntExtra(CATEGORY, 0);
+        }
+
         MenuItem menuItem = mNavigationView.getMenu().getItem(mSelectedCategory);
         onMenuItemSelected(menuItem);
+        mMainFragment.setPosition(position);
+        mMainFragment.updateData();
+
         if (movie != null) {
             onMovieSelect(movie, position);
         }
-
-        ((MainFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_main)).setPosition(position);
-        ((MainFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_main)).downloadData();
     }
 
     @Override
@@ -170,12 +197,12 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
             fm.beginTransaction()
                     .replace(R.id.movie_detail_container, fragment, DetailFragment.TAG)
                     .commit();
-
         } else {
             Intent intent = new Intent(this, MovieDetailActivity.class);
             intent.putExtra(MOVIE, movie);
             intent.putExtra(CATEGORY, mSelectedCategory);
             intent.putExtra(POSITION, position);
+            intent.putExtra(FAVORITES, mSwitch.isChecked());
             startActivity(intent);
         }
     }

@@ -58,7 +58,7 @@ public class DownloadService extends IntentService {
         broadcastIntent.setAction(DOWNLOAD);
 
         if(isOffline()) {
-            Toast.makeText(this, getResources().getString(R.string.no_connection), Toast.LENGTH_LONG).show();
+//            Toast.makeText(this, getResources().getString(R.string.no_connection), Toast.LENGTH_LONG).show(); // TODO: sending message to a Handler on a dead thread
             broadcastIntent.putExtra(STATUS, ERROR);
             LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
             downloadNotification(FAILED);
@@ -71,7 +71,7 @@ public class DownloadService extends IntentService {
             MovieApi service = retrofit.create(MovieApi.class);
 
             downloadNotification(STARTED);
-            Toast.makeText(this, R.string.downloadStarted, Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, R.string.downloadStarted, Toast.LENGTH_SHORT).show(); //TODO: sending message to a Handler on a dead thread
 
             Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+1:00"));
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
