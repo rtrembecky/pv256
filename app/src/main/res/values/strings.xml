@@ -15,4 +15,6 @@
     <string name="favorites">Favorites</string>
     <string name="favorite_removed">removed from favorites</string>
     <string name="favorite_added">added to favorites</string>
+    <string name="content_authority">cz.muni.fi.pv256.movio2.uco_422536.provider</string>
+    <string name="sync_account_type">cz.muni.fi.pv256.movio2.uco_422536.sync</string>
 </resources>

@@ -96,6 +96,7 @@ public class DetailFragment extends Fragment {
                     mFab.setImageResource(R.drawable.ic_add);
                 }
                 else {
+//                    mMovie.setReleaseDate(0);
                     mMovieManager.createMovie(mMovie);
                     Toast.makeText(mContext, mMovie.getTitle() + " " + getResources().getString(R.string.favorite_added), Toast.LENGTH_SHORT).show();
                     mFab.setImageResource(R.drawable.ic_clear);

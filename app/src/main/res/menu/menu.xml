@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/menu"
+    <item android:id="@+id/menu_item_switch"
           android:title="@string/favorites"
           app:showAsAction="always"
-          android:actionLayout="@layout/action_bar"/>
+          android:actionLayout="@layout/action_bar_favorites"/>
+
+    <item android:id="@+id/menu_item_sync"
+          android:layout_width="wrap_content"
+          android:actionLayout="@layout/action_bar_sync"
+          android:icon="@drawable/ic_action_sync"
+          android:title=""
+          app:showAsAction="ifRoom"/>
 </menu>

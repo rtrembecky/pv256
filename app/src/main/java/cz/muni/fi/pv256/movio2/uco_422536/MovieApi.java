@@ -3,6 +3,7 @@ package cz.muni.fi.pv256.movio2.uco_422536;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 /**
@@ -15,6 +16,9 @@ public interface MovieApi {
             "Accept: application/json",
             "Content-Type: application/json"
     })
+
+    @GET("movie/{id}?api_key=" + ApiKey.KEY)
+    Call<MovieDTO> getMovieById(@Path("id") Long id);
 
     @GET("discover/movie")
     Call<MovieList> getMovies(@Query("api_key") String apiKey,

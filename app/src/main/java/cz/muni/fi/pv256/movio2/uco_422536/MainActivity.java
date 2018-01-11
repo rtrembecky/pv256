@@ -1,6 +1,9 @@
 package cz.muni.fi.pv256.movio2.uco_422536;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
@@ -14,6 +17,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CompoundButton;
+import android.widget.Toast;
+
+import static cz.muni.fi.pv256.movio2.uco_422536.UpdaterSyncAdapter.SYNC_FINISHED;
 
 public class MainActivity extends AppCompatActivity implements MainFragment.OnMovieSelectListener {
 
@@ -36,6 +42,8 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
     private static int mPosition = 0;
     private static int mSelectedCategory = 0;
     private static boolean mFavorites = false;
+
+    private static IntentFilter syncIntentFilter = new IntentFilter(SYNC_FINISHED);
 
     public static int getPosition() {
         return mPosition;
@@ -94,6 +102,8 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
 
         MenuItem menuItem = mNavigationView.getMenu().getItem(mSelectedCategory);
         onMenuItemSelected(menuItem);
+
+        UpdaterSyncAdapter.initializeSyncAdapter(this);
     }
 
     private void onMenuItemSelected(MenuItem menuItem) {
@@ -134,6 +144,18 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(syncFinishedReceiver, syncIntentFilter);
+    }
+
+    @Override
+    protected void onPause() {
+        unregisterReceiver(syncFinishedReceiver);
+        super.onPause();
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putInt(POSITION, mPosition);
         super.onSaveInstanceState(outState);
@@ -159,6 +181,10 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
                 else
                     mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
+            case R.id.menu_item_sync:
+                UpdaterSyncAdapter.syncImmediately(getApplicationContext());
+                Toast.makeText(getApplicationContext(), R.string.downloadStarted, Toast.LENGTH_SHORT).show();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -167,8 +193,8 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
     public boolean onCreateOptionsMenu(Menu menu) {
         if (BuildConfig.logging) Log.w(TAG, "onCreateOptionsMenu");
         getMenuInflater().inflate(R.menu.menu, menu);
-        MenuItem item = menu.findItem(R.id.menu);
-        item.setActionView(R.layout.action_bar);
+        MenuItem item = menu.findItem(R.id.menu_item_switch);
+        item.setActionView(R.layout.action_bar_favorites);
         mSwitch = (SwitchCompat) item.getActionView().findViewById(R.id.favorites_switch);
         mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -226,6 +252,17 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
             startActivity(intent);
         }
     }
+
+    private BroadcastReceiver syncFinishedReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (mFavorites) {
+                mMainFragment.updateData();
+            }
+            Toast.makeText(context, getResources().getString(R.string.downloadDone), Toast.LENGTH_SHORT).show();
+        }
+    };
 // theme switch
 /*    public void buttonClick(View v) {
         mSharedEditor = mShared.edit();
