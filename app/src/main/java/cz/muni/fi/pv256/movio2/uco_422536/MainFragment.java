@@ -99,7 +99,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         mViewStub = (ViewStub) view.findViewById(R.id.viewstub_empty);
 
         MovieData.initialize();
-        setAdapter(mRecyclerView, (ArrayList<Movie>) MovieData.getMoviesByCategory(0));
+        setAdapter(mRecyclerView, (ArrayList<Movie>) MovieData.getMoviesByCategory(MainActivity.getmSelectedTimeInterval(), 0));
 
         return view;
     }
@@ -147,7 +147,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     private void updateCategoryData() {
-        List<Movie> movieList = MovieData.getMoviesByCategory(MainActivity.getSelectedCategory());
+        List<Movie> movieList = MovieData.getMoviesByCategory(MainActivity.getmSelectedTimeInterval(), MainActivity.getSelectedCategory());
         if (movieList.isEmpty()) {
             downloadData();
         } else {
@@ -206,7 +206,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                 movieList.addAll(getFilteredMovies((List<MovieDTO>) intent.getSerializableExtra(UPCOMING)));
                 successful = true;
             }
-            MovieData.setMoviesByCategory(MainActivity.getSelectedCategory(), movieList);
+            MovieData.setMoviesByCategory(MainActivity.getmSelectedTimeInterval(), MainActivity.getSelectedCategory(), movieList);
             updateView(movieList, successful);
         }
 

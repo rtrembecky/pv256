@@ -8,29 +8,30 @@ import java.util.List;
  */
 
 public class MovieData {
-    private static List<List<Movie>> movieCategoriesData = new ArrayList<>(3);
+    private static List<List<Movie>> movieCategoriesData = new ArrayList<>(6);
     private static List<Movie> favoriteData = new ArrayList<>();
 
     public static void initialize() {
-        movieCategoriesData.add(new ArrayList<>());
-        movieCategoriesData.add(new ArrayList<>());
-        movieCategoriesData.add(new ArrayList<>());
+        movieCategoriesData.clear();
+        for (int i = 0; i < 6; i++) {
+            movieCategoriesData.add(new ArrayList<>());
+        }
     }
 
-    public static List<Movie> getMoviesByCategory(int category) {
-        return movieCategoriesData.get(category);
+    public static List<Movie> getMoviesByCategory(int timeInterval, int category) {
+        return movieCategoriesData.get(timeInterval * 3 + category);
     }
 
-    public static void setMoviesByCategory(int category, List<Movie> data) {
+    public static void setMoviesByCategory(int timeInterval, int category, List<Movie> data) {
         try {
-            movieCategoriesData.remove(category);
+            movieCategoriesData.remove(timeInterval * 3 + category);
         }
         catch (IndexOutOfBoundsException e) {
             e.printStackTrace();
         }
         List<Movie> movieList = new ArrayList<>();
         movieList.addAll(data);
-        movieCategoriesData.add(category, movieList);
+        movieCategoriesData.add(timeInterval * 3 + category, movieList);
     }
 
     public static List<Movie> getFavoriteData() {

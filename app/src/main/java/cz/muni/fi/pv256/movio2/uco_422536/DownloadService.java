@@ -75,7 +75,10 @@ public class DownloadService extends IntentService {
 
             Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+1:00"));
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            String now = formatter.format(cal.getTime());
+            if (MainActivity.getmSelectedTimeInterval() == 1) {
+                cal.add(Calendar.DAY_OF_YEAR, -7);
+            }
+            String date = formatter.format(cal.getTime());
             cal.add(Calendar.DAY_OF_YEAR, 7);
             String weekLater = formatter.format(cal.getTime());
 
@@ -91,7 +94,7 @@ public class DownloadService extends IntentService {
                     genres = "12";
                     break;
             }
-            Call<MovieList> request = service.getMovies(ApiKey.KEY, "primary_release_date.asc", now, weekLater, genres);
+            Call<MovieList> request = service.getMovies(ApiKey.KEY, "primary_release_date.asc", date, weekLater, genres);
             try {
                 MovieList movieList = request.execute().body();
                 broadcastIntent.putExtra(UPCOMING, movieList.getResults());

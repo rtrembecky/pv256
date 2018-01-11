@@ -5,7 +5,7 @@
     <string name="title_activity_detail">Detail filmu</string>
     <string name="no_data">Žiadne dáta</string>
     <string name="no_connection">Žiadne internetové pripojenie</string>
-    <string name="all">Nadchádzajúce</string>
+    <string name="all">Všetky</string>
     <string name="menu_new">Nové</string>
     <string name="popular">Populárne</string>
     <string name="action">Akčné</string>
@@ -16,4 +16,6 @@
     <string name="favorites">Obľúbené</string>
     <string name="favorite_removed">odobraný z obľúbených</string>
     <string name="favorite_added">pridaný do obľúbených</string>
+    <string name="upcoming">Nadchádzajúce</string>
+    <string name="last_week">Minulý týždeň</string>
 </resources>

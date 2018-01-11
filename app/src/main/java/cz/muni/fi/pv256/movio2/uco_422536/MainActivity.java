@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
 
     public static final String MOVIE = "movie";
     public static final String CATEGORY = "category";
+    public static final String TIME_INTERVAL = "time_interval";
     public static final String POSITION = "position";
     public static final String FAVORITES = "favorites";
 
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
     private SwitchCompat mSwitch;
     private static int mPosition = 0;
     private static int mSelectedCategory = 0;
+    private static int mSelectedTimeInterval = 0;
     private static boolean mFavorites = false;
 
     private static IntentFilter syncIntentFilter = new IntentFilter(SYNC_FINISHED);
@@ -51,6 +53,10 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
 
     public static int getSelectedCategory() {
         return mSelectedCategory;
+    }
+
+    public static int getmSelectedTimeInterval() {
+        return mSelectedTimeInterval;
     }
 
     public static boolean isFavorites() {
@@ -100,47 +106,62 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
             }
         });
 
-        MenuItem menuItem = mNavigationView.getMenu().getItem(mSelectedCategory);
+        MenuItem menuItem = mNavigationView.getMenu().getItem(mSelectedTimeInterval).getSubMenu().getItem(mSelectedCategory);
         onMenuItemSelected(menuItem);
 
         UpdaterSyncAdapter.initializeSyncAdapter(this);
     }
 
     private void onMenuItemSelected(MenuItem menuItem) {
+        unCheckAllMenuItems(mNavigationView.getMenu());
+        getSupportActionBar().setTitle(menuItem.getTitle());
         switch (menuItem.getItemId()) {
-            case R.id.nav_all:
-                if(!menuItem.isChecked()) {
-                    getSupportActionBar().setTitle(menuItem.getTitle());
-                    mNavigationView.getMenu().getItem(1).setChecked(false);
-                    mNavigationView.getMenu().getItem(2).setChecked(false);
-                    mSelectedCategory = 0;
-                    if (BuildConfig.logging) Log.e(TAG, "calling updateData from onMenuSelected (nav_all)");
-                    mMainFragment.updateData();
-                }
+            case R.id.upcoming_all:
+                mSelectedCategory = 0;
+                mSelectedTimeInterval = 0;
+                if (BuildConfig.logging) Log.e(TAG, "calling updateData from onMenuSelected (nav_all)");
                 break;
-            case R.id.nav_action:
-                if(!menuItem.isChecked()) {
-                    getSupportActionBar().setTitle(menuItem.getTitle());
-                    mNavigationView.getMenu().getItem(0).setChecked(false);
-                    mNavigationView.getMenu().getItem(2).setChecked(false);
-                    mSelectedCategory = 1;
-                    if (BuildConfig.logging) Log.e(TAG, "calling updateData from onMenuSelected (nav_action)");
-                    mMainFragment.updateData();
-                }
+            case R.id.upcoming_action:
+                mSelectedCategory = 1;
+                mSelectedTimeInterval = 0;
+                if (BuildConfig.logging) Log.e(TAG, "calling updateData from onMenuSelected (nav_action)");
                 break;
-            case R.id.nav_adventure:
-                if(!menuItem.isChecked()) {
-                    getSupportActionBar().setTitle(menuItem.getTitle());
-                    mNavigationView.getMenu().getItem(0).setChecked(false);
-                    mNavigationView.getMenu().getItem(1).setChecked(false);
-                    mSelectedCategory = 2;
-                    if (BuildConfig.logging) Log.e(TAG, "calling updateData from onMenuSelected (nav_adventure)");
-                    mMainFragment.updateData();
-                }
+            case R.id.upcoming_adventure:
+                mSelectedCategory = 2;
+                mSelectedTimeInterval = 0;
+                if (BuildConfig.logging) Log.e(TAG, "calling updateData from onMenuSelected (nav_adventure)");
+                break;
+            case R.id.last_all:
+                mSelectedCategory = 0;
+                mSelectedTimeInterval = 1;
+                if (BuildConfig.logging) Log.e(TAG, "calling updateData from onMenuSelected (nav_all)");
+                break;
+            case R.id.last_action:
+                mSelectedCategory = 1;
+                mSelectedTimeInterval = 1;
+                if (BuildConfig.logging) Log.e(TAG, "calling updateData from onMenuSelected (nav_action)");
+                break;
+            case R.id.last_adventure:
+                mSelectedCategory = 2;
+                mSelectedTimeInterval = 1;
+                if (BuildConfig.logging) Log.e(TAG, "calling updateData from onMenuSelected (nav_adventure)");
                 break;
         }
+        mMainFragment.updateData();
         mDrawerLayout.closeDrawers();
         menuItem.setChecked(true);
+    }
+
+    private void unCheckAllMenuItems(@NonNull final Menu menu) {
+        int size = menu.size();
+        for (int i = 0; i < size; i++) {
+            final MenuItem item = menu.getItem(i);
+            if(item.hasSubMenu()) {
+                unCheckAllMenuItems(item.getSubMenu());
+            } else {
+                item.setChecked(false);
+            }
+        }
     }
 
     @Override
@@ -221,10 +242,11 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnMo
             mPosition = getIntent().getIntExtra(POSITION, 0);
             movie = getIntent().getParcelableExtra(MOVIE);
             mSelectedCategory = getIntent().getIntExtra(CATEGORY, 0);
+            mSelectedTimeInterval = getIntent().getIntExtra(TIME_INTERVAL, 0);
             mFavorites = getIntent().getBooleanExtra(FAVORITES, false);
         }
 
-        MenuItem menuItem = mNavigationView.getMenu().getItem(mSelectedCategory);
+        MenuItem menuItem = mNavigationView.getMenu().getItem(mSelectedTimeInterval).getSubMenu().getItem(mSelectedCategory);
         if (BuildConfig.logging) Log.e(TAG, "calling onMenuSelected AND updateData from onNewIntent");
         onMenuItemSelected(menuItem);
         mMainFragment.updateData();

@@ -4,7 +4,7 @@
     <string name="title_activity_detail">Movie Detail</string>
     <string name="no_data">No data</string>
     <string name="no_connection">No internet connection</string>
-    <string name="all">Upcoming</string>
+    <string name="all">All</string>
     <string name="menu_new">New</string>
     <string name="popular">Popular</string>
     <string name="action">Action</string>
@@ -17,4 +17,6 @@
     <string name="favorite_added">added to favorites</string>
     <string name="content_authority">cz.muni.fi.pv256.movio2.uco_422536.provider</string>
     <string name="sync_account_type">cz.muni.fi.pv256.movio2.uco_422536.sync</string>
+    <string name="upcoming">Upcoming</string>
+    <string name="last_week">Last Week</string>
 </resources>

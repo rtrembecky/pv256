@@ -1,9 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/nav_all"
-          android:title="@string/all"/>
-    <item android:id="@+id/nav_action"
-          android:title="@string/action"/>
-    <item android:id="@+id/nav_adventure"
-          android:title="@string/adventure"/>
+    <item android:title="@string/upcoming">
+        <menu>
+            <item android:id="@+id/upcoming_all"
+                  android:title="@string/all"/>
+            <item android:id="@+id/upcoming_action"
+                  android:title="@string/action"/>
+            <item android:id="@+id/upcoming_adventure"
+                  android:title="@string/adventure"/>
+        </menu>
+    </item>
+    <item android:title="@string/last_week">
+        <menu>
+            <item android:id="@+id/last_all"
+                  android:title="@string/all"/>
+            <item android:id="@+id/last_action"
+                  android:title="@string/action"/>
+            <item android:id="@+id/last_adventure"
+                  android:title="@string/adventure"/>
+        </menu>
+    </item>
 </menu>
