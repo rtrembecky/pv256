@@ -1,39 +1,51 @@
 package cz.muni.fi.pv256.movio2.uco_422536;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
+import android.view.ViewStub;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
+import java.util.List;
+
+import static cz.muni.fi.pv256.movio2.uco_422536.DownloadService.DOWNLOAD;
+import static cz.muni.fi.pv256.movio2.uco_422536.DownloadService.OK;
+import static cz.muni.fi.pv256.movio2.uco_422536.DownloadService.STATUS;
+import static cz.muni.fi.pv256.movio2.uco_422536.DownloadService.UPCOMING;
 
 /**
  * Created by Richard on 14.12.2017.
  */
 
-public class MainFragment extends Fragment {
+public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<Movie>>{
 
-    private static final String TAG = MainFragment.class.getSimpleName();
-    private static final String SELECTED_KEY = "selected_position";
+    public static final String TAG = MainFragment.class.getSimpleName();
 
-    private int mPosition = ListView.INVALID_POSITION;
+    private RecyclerView mRecyclerView;
+    private ViewStub mViewStub;
 
     private Context mContext;
-    private RecyclerView mRecyclerView;
+    private MovieAdapter mMovieAdapter;
     private OnMovieSelectListener mListener;
+    private MovieDownloadBroadcastReceiver mReceiver;
+    private SQLiteDatabase mDatabase;
+    private MovieManager mMovieManager;
+    private MovieDbHelper mDbHelper;
 
     @Override
     public void onAttach(Context activity) {
@@ -56,72 +68,157 @@ public class MainFragment extends Fragment {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
+        if (BuildConfig.logging) Log.e("MainFragment", "onCreate");
         super.onCreate(savedInstanceState);
 
-        mContext = getActivity().getApplicationContext();
+        mContext = getActivity();
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        if (BuildConfig.logging) Log.w(MainFragment.class.getSimpleName(), "onResume");
+        mReceiver = new MovieDownloadBroadcastReceiver();
+        IntentFilter intentFilter = new IntentFilter(DOWNLOAD);
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mReceiver, intentFilter);
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        if (BuildConfig.logging) Log.w(MainFragment.class.getSimpleName(), "onPause");
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mReceiver);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        if (BuildConfig.logging) Log.e("MainFragment", "onCreateView");
         View view = inflater.inflate(R.layout.fragment_main, container, false);
-
-        ArrayList<Movie> movieList = new ArrayList<>();
-        movieList.add(new Movie(getCurrentTime().getTime(), "olaf_cover", "Olaf's Frozen Adventure", "olaf", 5.9f));
-        movieList.add(new Movie(getCurrentTime().getTime(), "last_jedi_cover", "Star Wars: The Last Jedi", "last_jedi", 7.3f));
-        movieList.add(new Movie(getCurrentTime().getTime(), "coco_cover", "Coco", "coco", 7.5f));
-        movieList.add(new Movie(getCurrentTime().getTime(), "dunkirk_cover", "Dunkirk", "dunkirk", 7.4f));
-        movieList.add(new Movie(getCurrentTime().getTime(), "jumanji_cover", "Jumanji", "jumanji", 6.3f));
-
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_movies);
+        mViewStub = (ViewStub) view.findViewById(R.id.viewstub_empty);
 
-        if (movieList != null && !movieList.isEmpty()) {
-            setAdapter(mRecyclerView, movieList);
-        }
-        else {
-            view = inflater.inflate(R.layout.list_empty, container, false);
-            if (isOffline())
-                ((TextView) view.findViewById(R.id.list_empty_text)).setText("Not connected");
-        }
-
-        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
-            mPosition = savedInstanceState.getInt(SELECTED_KEY);
-
-            if (mPosition != ListView.INVALID_POSITION) {
-                mRecyclerView.smoothScrollToPosition(mPosition);
-            }
-        }
+        MovieData.initialize();
+        setAdapter(mRecyclerView, (ArrayList<Movie>) MovieData.getMoviesByCategory(0));
 
         return view;
     }
 
-    private Date getCurrentTime() {
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+1:00"));
-        return cal.getTime();
-    }
-
-    public boolean isOffline()
-    {
-        ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo network = cm.getActiveNetworkInfo();
-        return (network == null || !network.isConnected());
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        if (mPosition != ListView.INVALID_POSITION) {
-            outState.putInt(SELECTED_KEY, mPosition);
-        }
-        super.onSaveInstanceState(outState);
-    }
-
     private void setAdapter(RecyclerView movieRV, final ArrayList<Movie> movieList) {
-        MovieAdapter adapter = new MovieAdapter(movieList, getContext());
-        movieRV.setAdapter(adapter);
+        mMovieAdapter = new MovieAdapter(movieList, getContext());
+        movieRV.setAdapter(mMovieAdapter);
         movieRV.setLayoutManager(new LinearLayoutManager(mContext));
     }
 
+    @Override
+    public Loader<List<Movie>> onCreateLoader(int id, Bundle args) {
+        if (BuildConfig.logging) Log.e("MainFragment", "onCreateLoader");
+        return new SQLiteMovieLoader(this.getActivity(), mMovieManager, null, null, null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<Movie>> loader, List<Movie> data) {
+        if (BuildConfig.logging) Log.w("MaiFragment", "onLoadFinished");
+        MovieData.setFavoriteData(data);
+        updateView(MovieData.getFavoriteData());
+        mDatabase.close();
+        getLoaderManager().destroyLoader(1);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<Movie>> loader) {
+    }
+
+    public void updateData() {
+        if (BuildConfig.logging) Log.w(TAG, "updateData. Favorites: " + MainActivity.isFavorites());
+        if (MainActivity.isFavorites()) {
+            updateFavoritesData();
+        } else {
+            updateCategoryData();
+        }
+    }
+
+    private void updateFavoritesData() {
+        if (BuildConfig.logging) Log.w("MaiFragment", "updateFavoritesData");
+        mDbHelper = new MovieDbHelper(getActivity());
+        mDatabase = mDbHelper.getWritableDatabase();
+        mMovieManager = new MovieManager(mDatabase);
+        getLoaderManager().restartLoader(1, null, this);
+    }
+
+    private void updateCategoryData() {
+        List<Movie> movieList = MovieData.getMoviesByCategory(MainActivity.getSelectedCategory());
+        if (movieList.isEmpty()) {
+            downloadData();
+        } else {
+            updateView(movieList);
+        }
+    }
+
+    private void downloadData() {
+        Intent intent = new Intent(getActivity(), DownloadService.class);
+        getActivity().startService(intent);
+    }
+
+    private void updateView(List<Movie> movieList) {
+        updateView(movieList, true);
+    }
+    private void updateView(List<Movie> movieList, boolean successful) {
+        if (getActivity() == null) {
+            return;
+        }
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mMovieAdapter.setmMovieList(movieList);
+            }
+        });
+
+        if (movieList.isEmpty()) {
+            mRecyclerView.setVisibility(View.GONE);
+            mViewStub.setVisibility(View.VISIBLE);
+            TextView noDataTv = (TextView) getView().findViewById(R.id.list_empty_text);
+            if (successful) {
+                noDataTv.setText(getString(R.string.no_data));
+            } else {
+                noDataTv.setText(getString(R.string.no_connection));
+            }
+        } else {
+            mRecyclerView.setVisibility(View.VISIBLE);
+            mViewStub.setVisibility(View.GONE);
+            mRecyclerView.smoothScrollToPosition(MainActivity.getPosition());
+        }
+    }
+
     public interface OnMovieSelectListener {
-        void onMovieSelect(Movie movie);
+        void onMovieSelect(Movie movie, int position);
+    }
+
+    private class MovieDownloadBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (BuildConfig.logging) Log.e(TAG, intent.getAction());
+            String status = intent.getStringExtra(STATUS);
+            List<Movie> movieList = new ArrayList<>();
+            boolean successful = false;
+            if (status.equals(OK)) {
+                movieList.addAll(getFilteredMovies((List<MovieDTO>) intent.getSerializableExtra(UPCOMING)));
+                successful = true;
+            }
+            MovieData.setMoviesByCategory(MainActivity.getSelectedCategory(), movieList);
+            updateView(movieList, successful);
+        }
+
+        private List<Movie> getFilteredMovies(List<MovieDTO> movieList) {
+            List<Movie> movies = new ArrayList<>();
+            for (MovieDTO m : movieList) {
+                Movie movie = new Movie(m.getIdAsLong(), m.getReleaseDateAsLong(), m.getCoverPath(), m.getTitle(), m.getBackdrop(), m.getPopularityAsFloat(), m.getDescription());
+                if (movie.getBackdrop() != null && movie.getCoverPath() != null) {
+                    movies.add(movie);
+                }
+            }
+            return movies;
+        }
     }
 }
