@@ -13,4 +13,6 @@
     <string name="downloadFailed">Downloading failed!</string>
     <string name="downloadDone">Downloading done!</string>
     <string name="favorites">Favorites</string>
+    <string name="favorite_removed">removed from favorites</string>
+    <string name="favorite_added">added to favorites</string>
 </resources>

@@ -14,4 +14,6 @@
     <string name="downloadFailed">Sťahovanie dát zlyhalo!</string>
     <string name="downloadDone">Sťahovanie dát ukončené.</string>
     <string name="favorites">Obľúbené</string>
+    <string name="favorite_removed">odobraný z obľúbených</string>
+    <string name="favorite_added">pridaný do obľúbených</string>
 </resources>

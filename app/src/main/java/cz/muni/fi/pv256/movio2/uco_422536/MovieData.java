@@ -9,14 +9,7 @@ import java.util.List;
 
 public class MovieData {
     private static List<List<Movie>> movieCategoriesData = new ArrayList<>(3);
-
-    public static List<List<Movie>> getMovieCategoriesData() {
-        return movieCategoriesData;
-    }
-
-    public static void setMovieCategoriesData(List<List<Movie>> movieCategoriesData) {
-        MovieData.movieCategoriesData = movieCategoriesData;
-    }
+    private static List<Movie> favoriteData = new ArrayList<>();
 
     public static void initialize() {
         movieCategoriesData.add(new ArrayList<>());
@@ -35,6 +28,17 @@ public class MovieData {
         catch (IndexOutOfBoundsException e) {
             e.printStackTrace();
         }
-        movieCategoriesData.add(category, data);
+        List<Movie> movieList = new ArrayList<>();
+        movieList.addAll(data);
+        movieCategoriesData.add(category, movieList);
+    }
+
+    public static List<Movie> getFavoriteData() {
+        return favoriteData;
+    }
+
+    public static void setFavoriteData(List<Movie> favoriteData) {
+        MovieData.favoriteData.clear();
+        MovieData.favoriteData.addAll(favoriteData);
     }
 }

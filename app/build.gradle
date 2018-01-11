@@ -55,7 +55,7 @@ android {
             manifestPlaceholders = [ appLabel: "PV256 Movio 2" , appTheme: "@style/MainTheme"]
         }
         alt {
-            buildConfigField "boolean", "logging", "false"
+            buildConfigField "boolean", "logging", "true"
             manifestPlaceholders = [ appLabel: "PV256 Movio 2 Alt" , appTheme: "@style/SecondaryTheme"]
             applicationId "cz.muni.fi.pv256.movio2.alt"
         }
