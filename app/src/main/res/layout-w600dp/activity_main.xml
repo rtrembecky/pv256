@@ -5,6 +5,7 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="match_parent"
                   android:baselineAligned="false"
@@ -30,12 +31,12 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="4"/>
-
     </LinearLayout>
-<android.support.design.widget.NavigationView
-    android:id="@+id/navigation"
-    android:layout_width="wrap_content"
-    android:layout_height="match_parent"
-    android:layout_gravity="start"
-    app:menu="@menu/nav_items"/>
+
+    <android.support.design.widget.NavigationView
+        android:id="@+id/navigation"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:menu="@menu/navigation"/>
 </android.support.v4.widget.DrawerLayout>

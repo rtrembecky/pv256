@@ -1,39 +1,77 @@
 <!-- Master layout. -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            xmlns:app="http://schemas.android.com/apk/res-auto">
+    
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="top">
+        <RelativeLayout
+            android:id="@+id/detail_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/detail_icon"
+            <RelativeLayout
+                android:id="@+id/detail_top_part"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/primary">
+
+                <ImageView
+                    android:id="@+id/detail_backdrop"
+                    android:layout_width="match_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_gravity="center"
+                    android:adjustViewBounds="true"/>
+
+                <ImageView
+                    android:id="@+id/detail_cover"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-50dp"
+                    android:layout_below="@id/detail_backdrop"
+                    android:padding="10dp"/>
+
+                <TextView
+                    android:id="@+id/detail_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@+id/detail_cover"
+                    android:layout_below="@id/detail_backdrop"
+                    android:layout_margin="10dp"
+                    android:textAppearance="?android:textAppearanceLarge"
+                    android:textColor="@android:color/white"/>
+
+                <TextView
+                    android:id="@+id/detail_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@+id/detail_cover"
+                    android:layout_below="@+id/detail_title"
+                    android:layout_margin="10dp"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:textColor="@android:color/white"/>
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/detail_desc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/detail_top_part"
+                android:layout_margin="10dp"
+                android:textAppearance="?android:textAppearanceMedium"/>
+        </RelativeLayout>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="10dp"/>
-
-        <TextView
-            android:id="@+id/detail_movie"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/detail_icon"
-            android:padding="10dp"
-            android:textAppearance="?android:textAppearanceLarge"
-            android:textColor="@color/grey_700"
-            android:textSize="12pt" />
-
-        <TextView
-            android:id="@+id/detail_movie_low"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/detail_icon"
-            android:layout_below="@+id/detail_movie"
-            android:padding="10dp"
-            android:textAppearance="?android:textAppearanceLarge"
-            android:textColor="@color/grey_700"
-            android:textSize="8pt" />
-    </RelativeLayout>
-
+            android:layout_margin="16dp"
+            android:clickable="true"
+            android:src="@drawable/ic_add"
+            app:layout_anchor="@id/detail_backdrop"
+            app:layout_anchorGravity="bottom|right|end"/>
+    </android.support.design.widget.CoordinatorLayout>
 </ScrollView>

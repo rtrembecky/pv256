@@ -8,11 +8,21 @@ import android.os.Parcelable;
  */
 
 public class Movie implements Parcelable {
+    private Long mId;
     private long mReleaseDate;
     private String mCoverPath;
     private String mTitle;
     private String mBackdrop;
     private float mPopularity;
+    private String mDescription;
+
+    public Long getId() {
+        return mId;
+    }
+
+    public void setId(Long id) {
+        mId = id;
+    }
 
     public long getReleaseDate() {
         return mReleaseDate;
@@ -54,12 +64,22 @@ public class Movie implements Parcelable {
         mPopularity = popularity;
     }
 
-    public Movie(long releaseDate, String coverPath, String title, String backdrop, float popularity) {
+    public String getDescription() {
+        return mDescription;
+    }
+
+    public void setDescription(String description) {
+        mDescription = description;
+    }
+
+    public Movie(long id, long releaseDate, String coverPath, String title, String backdrop, float popularity, String description) {
+        mId = id;
         mReleaseDate = releaseDate;
         mCoverPath = coverPath;
         mTitle = title;
         mBackdrop = backdrop;
         mPopularity = popularity;
+        mDescription = description;
     }
 
     @Override
@@ -69,19 +89,23 @@ public class Movie implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(mId);
         dest.writeLong(mReleaseDate);
         dest.writeString(mCoverPath);
         dest.writeString(mTitle);
         dest.writeString(mBackdrop);
         dest.writeFloat(mPopularity);
+        dest.writeString(mDescription);
     }
 
     public Movie(Parcel in) {
+        mId = in.readLong();
         mReleaseDate = in.readLong();
         mCoverPath = in.readString();
         mTitle = in.readString();
         mBackdrop = in.readString();
         mPopularity = in.readFloat();
+        mDescription = in.readString();
     }
 
     public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
